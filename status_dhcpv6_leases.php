@@ -33,7 +33,7 @@
 
 require_once("guiconfig.inc");
 require_once("config.inc");
-require_once("parser_dhcpv6_leases.inc");
+require_once("parser/parser_dhcpv6_leases.inc");
 
 $pgtitle = array(gettext("Status"), gettext("DHCPv6 Leases"));
 $shortcut_section = "dhcp6";
@@ -147,7 +147,7 @@ $lang_pack = [ 'online' =>  $online_string, 'offline' => $offline_string,
                'active' =>  $active_string, 'expired' => $expired_string,
                'reserved' => $reserved_string, 'released' => $released_string,
                'dynamic' => $dynamic_string, 'static' =>  $static_string];
-// Handle the content of the lease file - parser_dhcpv6_leases.inc
+// Handle the content of the lease file - parser/parser_dhcpv6_leases.inc
 gui_parse_leases ($pools, $leases, $prefixes, $mappings, $leases_content,
 									$ndpdata, $lang_pack);
 

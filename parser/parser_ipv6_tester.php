@@ -1,12 +1,5 @@
 <?php
 /*
- * IMPORTANT: The below license will get applied if I am allowed by Aeron
- * http://home.deds.nl/~aeron/regex/ to use his valid and invalid IPv6 addresses
- * If not, I will remove the aeron_list, aeron_text and aeron_invalid_text
- * from this source and apply the license thereafter.
- */
-
-/*
  * parser_ipv6_tester.php
  *
  * Copyright (c) 2017 Anders Lind (anders.lind@gmail.com)
@@ -120,7 +113,15 @@ function test_parse_ipv6 ($content, $checklist, $only_errors) {
   echo "Total amount of passes: ".($counter - $fail_counter)."\n";
 }
 
-// http://home.deds.nl/~aeron/regex/valid_ipv6.txt
+/*
+ * Below lists with permission from Aeron of http://home.deds.nl/~aeron/regex/
+ * aeron_list
+ * aeron_text
+ * aeron_invalid_text
+ * Thanks! :)
+ *
+ * http://home.deds.nl/~aeron/regex/valid_ipv6.txt
+ */
 const aeron_list = [
 '1111:2222:3333:4444:5555:6666:7777:8888',
 '1111:2222:3333:4444:5555:6666:7777::',
