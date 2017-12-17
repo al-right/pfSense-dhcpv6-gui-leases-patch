@@ -29,15 +29,15 @@
   returns false or if $var[$index] is a string and (strlen ($var[$index]) < 1)
 */
 function setnlen ($var, $index) {
-  if (isset ($var) && isset ($index) && isset($var[$index])) {
-    if (is_string ($var[$index])) {
-      return strlen ($var[$index]) > 0;
-    }
+	if (isset ($var) && isset ($index) && isset($var[$index])) {
+		if (is_string ($var[$index])) {
+			return strlen ($var[$index]) > 0;
+		}
 
-    return true;
-  }
+		return true;
+	}
 
-  return false;
+	return false;
 }
 
 // alternatives: https://unicode-table.com/en/#enclosed-alphanumerics e.g.'⊢'
@@ -67,20 +67,20 @@ function general_debug ($var, ...$params) {
 			// to need the reference & - maybe because the rest either resides inside
 			// a static method. Anyway we are not going to change/redefine either of
 			// the variables inside.
-		  $inner_debug = function ($rerun, $var, $params) use (&$inner_debug) {
-        static $has_utf8, $index_mark;
-        if (!isset ($has_utf8)) {
-          // For testing try: setLocale(LC_CTYPE, 'C');
-          $has_utf8 = preg_match ('/utf-?8$/i', setLocale(LC_CTYPE, 0));
-          if ($has_utf8) {
-            $index_mark['last'] = index_mark['utf8']['last'];
-            $index_mark['normal'] = index_mark['utf8']['normal'];
-          }
-          else {
-            $index_mark['last'] = index_mark['other']['last'];
-            $index_mark['normal'] = index_mark['other']['normal'];
-          }
-        }
+			$inner_debug = function ($rerun, $var, $params) use (&$inner_debug) {
+			        static $has_utf8, $index_mark;
+			        if (!isset ($has_utf8)) {
+			          // For testing try: setLocale(LC_CTYPE, 'C');
+			          $has_utf8 = preg_match ('/utf-?8$/i', setLocale(LC_CTYPE, 0));
+			          if ($has_utf8) {
+			            $index_mark['last'] = index_mark['utf8']['last'];
+			            $index_mark['normal'] = index_mark['utf8']['normal'];
+			          }
+			          else {
+			            $index_mark['last'] = index_mark['other']['last'];
+			            $index_mark['normal'] = index_mark['other']['normal'];
+			          }
+			        }
 
 				static $the_choice;
 				if (!isset($the_choice)) {
@@ -143,23 +143,23 @@ function general_debug ($var, ...$params) {
 						}
 					}
 					else {
-            if (isset ($var)) {
-  						echo "$var\n";
-            }
-            else {
-              echo "undefined@7\n";
-            }
+						if (isset ($var)) {
+  							echo "$var\n";
+						}
+						else {
+							echo "undefined@7\n";
+						}
 					}
 				} // Or are we given a $var who is not an array
 				else if ( ! is_array ($var)) {
 
 					// If yes, print it
-          if (setnlen ($var, 0)) {
+					if (setnlen ($var, 0)) {
 						echo "$var\n";
-          }
-          else {
-            echo "undefined@8\n";
-          }
+					}
+					else {
+						echo "undefined@8\n";
+					}
 
 					// Regardless if params were given by second iterations or directly
 					// at the first run it means we need to print all param key indexes
@@ -217,7 +217,7 @@ function general_debug ($var, ...$params) {
 									// use value2 (indirect from $params) as the look up index
 									// in $var and use the_choice to return the tree of return
 									// values.
-                  $the_choice ( ! $dec_counter, '', $value2, (setnlen ($var, $value2) ? $var[$value2] : 'undefined@9'));
+									$the_choice ( ! $dec_counter, '', $value2, (setnlen ($var, $value2) ? $var[$value2] : 'undefined@9'));
 								}
 							}
 						}

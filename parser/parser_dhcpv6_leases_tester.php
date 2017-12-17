@@ -31,28 +31,28 @@ $pfSense_platform_file='/etc/platform';
 
 $is_pfSense = file_exists ($pfSense_platform_file);
 if ($is_pfSense) {
-  if ( ! preg_match ('/^pfSense/i',file_get_contents($pfSense_platform_file))) {
-    $is_pfSense = false;
-  }
+	if ( ! preg_match ('/^pfSense/i',file_get_contents($pfSense_platform_file))) {
+		$is_pfSense = false;
+	}
 }
 
 if (isset ($argv[1])) {
-  $leasesfile = $argv[1];
+	$leasesfile = $argv[1];
 }
 else if ($is_pfSense) {
-  $leasesfile = $pfSense_lease_file;
+	$leasesfile = $pfSense_lease_file;
 }
 else {
-  echo 'Please pass the filename of the lease file.' . PHP_EOL;
-  exit (1);
+	echo 'Please pass the filename of the lease file.' . PHP_EOL;
+	exit (1);
 }
 
 if (file_exists ($leasesfile)) {
-  $raw_leases=file_get_contents($leasesfile);
+	$raw_leases=file_get_contents($leasesfile);
 }
 else {
-  echo "Lease file '$leasesfile' does not exist!" . PHP_EOL;
-  exit (2);
+	echo "Lease file '$leasesfile' does not exist!" . PHP_EOL;
+	exit (2);
 }
 
 $lang_pack = [ 'online' =>  'online',
@@ -69,9 +69,9 @@ $leases = array();
 $prefixes = array();
 $mappings = array();
 if ($is_pfSense) {
-  $ndpdata = get_ndpdata ();
+	$ndpdata = get_ndpdata ();
 } else {
-  $ndpdata = array(); // Empty for now - no test data!
+	$ndpdata = array(); // Empty for now - no test data!
 }
 
 gui_parse_leases ($pools, $leases, $prefixes, $mappings, $raw_leases, $ndpdata, $lang_pack);

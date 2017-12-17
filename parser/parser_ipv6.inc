@@ -25,99 +25,99 @@
 ##|-PRIV
 
 /*
- List of methods used:
- (?x)  Free-spacing mode.
-       Ability to use comments, place white space characters without impact,
-       both newlines and white spaces are simply ignored unless escaped
-       intentionally.
-       Use "\ " to indicate a space e.g. like: Hey\ there.
-       You might want to take a look:
-       https://www.regular-expressions.info/freespacing.html
-
- #  Comment under Free-spacing mode.
-    If free-spacing mode is not on one can use (?#Some comment)
-
- (?(DEFINE)  Subpatthern.
-             Defines a subpattern that we intend to use
-
- (?'hexncolon'  A named group.
-                Can be used to define the group name of a subpattern
-                or simply to give a matching group a name that is more 'logic'
-                to use than a numbered group that might even change if the
-                regular expression is changed.
-
- (?&hextet)  Reference to use.
-             Use/reference to the named group, which might be a subpattern.
-
- (?=  Positive lookahead.
-      Used when we want to make sure something is in the horizon before
-      we start to match!
-
- (?!  Negative lookahead.
-      Used when we want to make sure something is NOT in the horizon before
-      we start to match!
-
- ()  Capturing group.
-     Normally identified by a number that corresponds to when it shows up
-     in the regular expression.
-
- (?:  Non-capturing group.
-      Identifies a Non-capturing group that is useful if you e.g. need to
-      repeat a match e.g. of a compound expression ab\d, but without capturing
-      it: (?:ab\d)
-
- (?>  Atomic (capturing) group.
-      When it has a match it throws away all backtracking info it might have
-      meaning it won't try alternatations if there e.g. is a |.
-
- \G  We use \G once to alternate away from acceptable characters and instead
-     match from the point where the last match ended. In our case below it is
-		 used to match at the start of the first line so we do not miss a match.
-
-For now everything runs stable.
-
-It we want we could make the following changes / investigations in the future:
-	* At 1. in expression (?>(?&nohexncolonndot)+|\G) experiment with:
-		\G vs |^|\s+ vs |^
-		, if we want to optimize on speed/results.
-		Expression handles cases at start and following matches.
-
-	* Make 2 versions:
-		One for IPv6 only and another that resemble what we have today (IPv6+IPv4).
-		In that way we would have two regexes that can be chosen from.
-		That would include when to use hexncolonndot (ipv6+ipv4) vs hexncolon (ipv6)
-
-	* Experiment to move check_noclosingsinglecolon to the start right inside of
-		(?'MATCH'
-		, to see if we receive a speed improvement (that is stable of course).
-		My hunch is that it wont work stable and likely require more steps in
-		general also it seem less useful for the +IPv4 cases so experiment maybe as
-		well right after: (?'IPV6'
-
-Main capturing groups:
-	MATCH=We have a match
-
-	Explanation to naming of the main groups below this section:
-		C=double colon (::)
-		L=Left
-		M=Middle
-		R=Right
-		U=Unspecified address (:: alone)
-		FULL=Full address not compressed with C/double colon
-		6=IPv6
-		4=IPv4
-	, gives:
-
-	IPV64
-	2. FULL64
-	3. CMR64
-	4. CLU64
-
-	IPV6
-	5. FULL6
-	6. CMR6
-	7. CLU6
-*/
+ * List of methods used:
+ * (?x)  Free-spacing mode.
+ *       Ability to use comments, place white space characters without impact,
+ *       both newlines and white spaces are simply ignored unless escaped
+ *       intentionally.
+ *       Use "\ " to indicate a space e.g. like: Hey\ there.
+ *       You might want to take a look:
+ *       https://www.regular-expressions.info/freespacing.html
+ *
+ * #  Comment under Free-spacing mode.
+ *    If free-spacing mode is not on one can use (?#Some comment)
+ *
+ * (?(DEFINE)  Subpatthern.
+ *             Defines a subpattern that we intend to use
+ *
+ * (?'hexncolon'  A named group.
+ *                Can be used to define the group name of a subpattern
+ *                or simply to give a matching group a name that is more 'logic'
+ *                to use than a numbered group that might even change if the
+ *                regular expression is changed.
+ *
+ * (?&hextet)  Reference to use.
+ *             Use/reference to the named group, which might be a subpattern.
+ *
+ * (?=  Positive lookahead.
+ *      Used when we want to make sure something is in the horizon before
+ *      we start to match!
+ *
+ * (?!  Negative lookahead.
+ *      Used when we want to make sure something is NOT in the horizon before
+ *      we start to match!
+ *
+ * ()  Capturing group.
+ *     Normally identified by a number that corresponds to when it shows up
+ *     in the regular expression.
+ *
+ * (?:  Non-capturing group.
+ *      Identifies a Non-capturing group that is useful if you e.g. need to
+ *      repeat a match e.g. of a compound expression ab\d, but without capturing
+ *      it: (?:ab\d)
+ *
+ * (?>  Atomic (capturing) group.
+ *      When it has a match it throws away all backtracking info it might have
+ *      meaning it won't try alternatations if there e.g. is a |.
+ *
+ * \G  We use \G once to alternate away from acceptable characters and instead
+ *     match from the point where the last match ended. In our case below it is
+ *     used to match at the start of the first line so we do not miss a match.
+ *
+ * For now everything runs stable.
+ *
+ * It we want we could make the following changes / investigations in the future:
+ *	* At 1. in expression (?>(?&nohexncolonndot)+|\G) experiment with:
+ *		\G vs |^|\s+ vs |^
+ *		, if we want to optimize on speed/results.
+ *		Expression handles cases at start and following matches.
+ *
+ *	* Make 2 versions:
+ *		One for IPv6 only and another that resemble what we have today (IPv6+IPv4).
+ *		In that way we would have two regexes that can be chosen from.
+ *		That would include when to use hexncolonndot (ipv6+ipv4) vs hexncolon (ipv6)
+ *
+ *	* Experiment to move check_noclosingsinglecolon to the start right inside of
+ *		(?'MATCH'
+ *		, to see if we receive a speed improvement (that is stable of course).
+ *		My hunch is that it wont work stable and likely require more steps in
+ *		general also it seem less useful for the +IPv4 cases so experiment maybe as
+ *		well right after: (?'IPV6'
+ *
+ * Main capturing groups:
+ *	MATCH=We have a match
+ *
+ *	Explanation to naming of the main groups below this section:
+ *		C=double colon (::)
+ *		L=Left
+ *		M=Middle
+ *		R=Right
+ *		U=Unspecified address (:: alone)
+ *		FULL=Full address not compressed with C/double colon
+ *		6=IPv6
+ *		4=IPv4
+ *	, gives:
+ *
+ *	IPV64
+ *	2. FULL64
+ *	3. CMR64
+ *	4. CLU64
+ *
+ *	IPV6
+ *	5. FULL6
+ *	6. CMR6
+ *	7. CLU6
+ */
 
 const ipv6_regex = <<<'IPV6'
 (?x)
@@ -243,6 +243,6 @@ IPV6;
  * Small wrapper function to match all the lease content.
  */
 function parse_all_ipv6_to_array ($content) {
-  preg_match_all('/'.ipv6_regex.'/i',$content,$matches,PREG_SET_ORDER);
-  return $matches;
+	preg_match_all('/'.ipv6_regex.'/i',$content,$matches,PREG_SET_ORDER);
+	return $matches;
 }

@@ -90,42 +90,42 @@ const IA_TA = 3;
 function gui_parse_leases (&$pools, &$leases, &$prefixes, &$mappings, $raw_leases, $ndpdata, $lang_pack) {
 	$amount_of_matches = preg_match_all('/'.base_regex.'/i',$raw_leases,$lease_array,PREG_SET_ORDER);
 
-  if ($amount_of_matches == false) {
-    return false;
-  }
+	if ($amount_of_matches == false) {
+		return false;
+	}
 
 	$amount_of_leases=0;
-  foreach ($lease_array as $val) {
+	foreach ($lease_array as $val) {
 		general_debug ('---LEASE '.++$amount_of_leases.' START---');
 
-    $iaid_duid = parse_duid ($val['IAID_DUID']);
+		$iaid_duid = parse_duid ($val['IAID_DUID']);
 
 		general_debug ($val, 'IAID_DUID');
 
-    $entry = [ 'iaid' => hexdec(implode("", array_reverse ($iaid_duid[0]))),
-               'duid' => implode (":", $iaid_duid[1]) ];
+		$entry = [ 'iaid' => hexdec(implode("", array_reverse ($iaid_duid[0]))),
+			   'duid' => implode (":", $iaid_duid[1]) ];
 
  		general_debug ($entry, 'iaid');
 		general_debug ($entry, 'duid');
 
-    if (preg_match('/^ia-na$/i', $val['IA_ASSOC'])) {
-      gui_parse_single_lease (IA_NA, $val['NEXT_LEVEL'], $lang_pack, $ndpdata, $mappings, $entry);
-      $leases[] = $entry;
-    }
-    else if (preg_match('/^ia-pd$/i', $val['IA_ASSOC'])) {
-			gui_parse_single_lease (IA_PD, $val['NEXT_LEVEL'], $lang_pack, $ndpdata, $mappings, $entry);
-      $prefixes[] = $entry;
-    }
+		if (preg_match('/^ia-na$/i', $val['IA_ASSOC'])) {
+			gui_parse_single_lease (IA_NA, $val['NEXT_LEVEL'], $lang_pack, $ndpdata, $mappings, $entry);
+			$leases[] = $entry;
+		}
+		else if (preg_match('/^ia-pd$/i', $val['IA_ASSOC'])) {
+				gui_parse_single_lease (IA_PD, $val['NEXT_LEVEL'], $lang_pack, $ndpdata, $mappings, $entry);
+				$prefixes[] = $entry;
+		}
 		else if (preg_match('/^ia-ta$/i', $val['IA_ASSOC'])) {
 			// Not used in the pfSense UI at the moment.
 			general_debug ('Notice: ia-ta is unhandled for now.');
 		}
 
 		general_debug ("---LEASE $amount_of_leases END---\n");
-  }
+	}
 
 	// Handle failover - NOTE Experimental;
-	//											  has not been tested on a live configured system.
+	// has not been tested on a live configured system.
 	$amount_of_matches = preg_match_all('/'.failover_base_regex.'/i',$raw_leases,$lease_array,PREG_SET_ORDER);
 	$amount_of_leases=0;
 	foreach ($lease_array as $val) {
@@ -150,7 +150,7 @@ function gui_parse_single_lease ($type, $content, $lang_pack, $ndpdata, &$mappin
 	else if ($type === IA_PD) {
 		preg_match_all('/'.pd_regex.'/i',$content,$matches,PREG_SET_ORDER);
 	}
-  /*else if	($type === IA_TA) {
+	/*else if ($type === IA_TA) {
 		// Not implemented in pfSense.
 	}*/
 	else {
@@ -158,7 +158,7 @@ function gui_parse_single_lease ($type, $content, $lang_pack, $ndpdata, &$mappin
 		return -1;
 	}
 
-  $amount_of_matches=0;
+	$amount_of_matches=0;
 
 	foreach ($matches as $val) {
 		general_debug ("\n  --Match number " . ++$amount_of_matches . ' start.');
@@ -188,30 +188,30 @@ function gui_parse_single_lease ($type, $content, $lang_pack, $ndpdata, &$mappin
 }
 
 function gui_parse_single_na_lease ($val, $lang_pack, $ndpdata, &$mappings, &$entry) {
-  if (setnlen($val,'ADDRESS')) {
-    general_debug ($val, 'ADDRESS');
+	if (setnlen($val,'ADDRESS')) {
+	  	general_debug ($val, 'ADDRESS');
 
-    $space_result = parse_all_ipv6_to_array ($val['ADDRESS']);
+		$space_result = parse_all_ipv6_to_array ($val['ADDRESS']);
 
-    if (count($space_result) == 1) {
-      if (setnlen($space_result[0],'MATCH')) {
-        $entry['ip'] = $space_result[0]['MATCH'];
-        $entry['type'] = $lang_pack['dynamic'];
-        if (in_array($entry['ip'], array_keys($ndpdata))) {
-          $entry['online'] = $lang_pack['online'];
-        } else {
-          $entry['online'] = $lang_pack['offline'];
-        }
+		if (count($space_result) == 1) {
+	    		if (setnlen($space_result[0],'MATCH')) {
+				$entry['ip'] = $space_result[0]['MATCH'];
+				$entry['type'] = $lang_pack['dynamic'];
+				if (in_array($entry['ip'], array_keys($ndpdata))) {
+					$entry['online'] = $lang_pack['online'];
+				} else {
+					$entry['online'] = $lang_pack['offline'];
+				}
 
-        general_debug ("We have a valid ipv6 address");
+				general_debug ("We have a valid ipv6 address");
 
 				$mappings[$entry['duid']] = $entry['ip'];
-      }
-    }
+			}
+		}
 		else {
 			general_debug ('WARNING: Count of IPv6 addresses is: '.count($space_result));
 		}
-  }
+	}
 }
 
 function gui_parse_single_pd_lease ($val, $lang_pack, &$entry) {
@@ -246,50 +246,51 @@ function gui_parse_single_pd_lease ($val, $lang_pack, &$entry) {
 }
 
 function gui_handle_ia($content, &$entry, $lang_pack) {
-  preg_match_all('/'.ia_regex.'/i',$content,$ia_matches,PREG_SET_ORDER);
+	preg_match_all('/'.ia_regex.'/i',$content,$ia_matches,PREG_SET_ORDER);
 
-  foreach ($ia_matches as $ia_val) {
-    if (setnlen($ia_val,'BINDINGSTATE')) {
-      switch ($ia_val['BINDINGSTATE']) {
-        case "active":
-          $entry['act'] = $lang_pack['active'];
-          break;
-        case "free":
-          $entry['act'] = $lang_pack['expired'];
-          $entry['online'] = $lang_pack['offline'];
-          break;
-        case "backup":
-          $entry['act'] = $lang_pack['reserved'];
-          $entry['online'] = $lang_pack['offline'];
-          break;
-        case "released":
-          $entry['act'] = $lang_pack['released'];
-          $entry['online'] = $lang_pack['offline'];
-      }
+	foreach ($ia_matches as $ia_val) {
+		if (setnlen($ia_val,'BINDINGSTATE')) {
+			switch ($ia_val['BINDINGSTATE']) {
+				case "active":
+					$entry['act'] = $lang_pack['active'];
+					break;
+				case "free":
+					$entry['act'] = $lang_pack['expired'];
+					$entry['online'] = $lang_pack['offline'];
+					break;
+				case "backup":
+					$entry['act'] = $lang_pack['reserved'];
+					$entry['online'] = $lang_pack['offline'];
+					break;
+				case "released":
+					$entry['act'] = $lang_pack['released'];
+					$entry['online'] = $lang_pack['offline'];
+					break;
+			}
 
-      general_debug ($ia_val, 'BINDINGSTATE');
-    }
-    if (setnlen($ia_val,'PREFLIFE')) {
+			general_debug ($ia_val, 'BINDINGSTATE');
+		}
+		if (setnlen($ia_val,'PREFLIFE')) {
 			// does not seem to be used by lease gui
-      general_debug ($ia_val, 'PREFLIFE');
-    }
-    if (setnlen($ia_val,'MAXLIFE')) {
+			general_debug ($ia_val, 'PREFLIFE');
+		}
+		if (setnlen($ia_val,'MAXLIFE')) {
 			// does not seem to be used by lease gui
-      general_debug ($ia_val, 'MAXLIFE');
-    }
-    if (setnlen($ia_val,'ENDS')) {
-      $entry['end'] = $ia_val['DATE'] . ' ' . $ia_val['TIME'];
+			general_debug ($ia_val, 'MAXLIFE');
+		}
+		if (setnlen($ia_val,'ENDS')) {
+			$entry['end'] = $ia_val['DATE'] . ' ' . $ia_val['TIME'];
 
 			general_debug ($ia_val, 'ENDS', 'WEEKDAY', 'DATE', 'YEAR', 'MONTH', 'DAY', 'TIME');
-    }
-  }
+		}
+	}
 }
 
 function gui_parse_single_failover ($content, &$entry) {
 	preg_match_all('/'.failover_level1_regex.'/i',$content,$matches,PREG_SET_ORDER);
 
 	foreach ($matches as $val) {
-    if (setnlen($val,'MYSTATE')) {
+		if (setnlen($val,'MYSTATE')) {
 			general_debug ($val, 'MYSTATE');
 			$entry['mystate'] = $val['MYSTATE'];
 		}
@@ -307,44 +308,44 @@ function gui_parse_single_failover ($content, &$entry) {
 		}
 		if (setnlen($val,'MCLT')) {
 			/* does not seem to be used by lease gui
-			   mclt (Maximum Client Lead Time):
-			   https://kb.isc.org/article/AA-00502/0/A-Basic-Guide-to-Configuring-DHCP-Failover.html
-				 https://kb.isc.org/article/AA-00268/0/DHCP-Failover-and-MCLT-configuration-implications.html
-			*/
+			 * mclt (Maximum Client Lead Time):
+			 * https://kb.isc.org/article/AA-00502/0/A-Basic-Guide-to-Configuring-DHCP-Failover.html
+			 * https://kb.isc.org/article/AA-00268/0/DHCP-Failover-and-MCLT-configuration-implications.html
+			 */
 			general_debug ($val, 'MCLT');
 		}
 	}
 }
 
 /* Main leases - Level 0
-   regex matches the outer/top level of a lease
-   We allow free spacing and comments with (?x)
-   We capture:
-   . the identity association of a temporary address and non-temporary address
-   and delegated prefix (IA-TA, IA-NA and IA-PD)
-   . the partly octal encoded iaid + duid (Identity association identifier + DHCP Unique Identifier)
-   . the content at the next level,
-   but our matching also reuses our
-   current match (RECURSE) to make sure
-   there is a balance to the curly braces {}
-   semicolons where there are no curly braces
-   and sub-content to curly braces - but neither the
-   next level and sub levels are directly
-   individually matched/captured (that is for later
-   regex matches to achieve!)
-
-	 \x5C = \
-	 Octal numbers are the characters that are found in the IAID and DUID with a
-	 backslash \ in front of them.
-	 Hex values in ranges are those characters that are printed as characters (not
-	 octal values):
-	 [\x20\x21\x23-\x5B\x5D-\x7E]
-	 1. See ascii table that includes hex values:
-	    https://en.wikipedia.org/wiki/ASCII#Printable_characters
-	    https://en.wikipedia.org/wiki/ASCII#Character_set
-	 2. Check: https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=common/print.c
-	 3. isprint is more limited than isascii: http://www.cplusplus.com/reference/cctype/isprint/
-*/
+ * regex matches the outer/top level of a lease
+ * We allow free spacing and comments with (?x)
+ * We capture:
+ * . the identity association of a temporary address and non-temporary address
+ * and delegated prefix (IA-TA, IA-NA and IA-PD)
+ * . the partly octal encoded iaid + duid (Identity association identifier + DHCP Unique Identifier)
+ * . the content at the next level,
+ * but our matching also reuses our
+ * current match (RECURSE) to make sure
+ * there is a balance to the curly braces {}
+ * semicolons where there are no curly braces
+ * and sub-content to curly braces - but neither the
+ * next level and sub levels are directly
+ * individually matched/captured (that is for later
+ * regex matches to achieve!)
+ *
+ *	 \x5C = \
+ *	 Octal numbers are the characters that are found in the IAID and DUID with a
+ *	 backslash \ in front of them.
+ *	 Hex values in ranges are those characters that are printed as characters (not
+ *	 octal values):
+ *	 [\x20\x21\x23-\x5B\x5D-\x7E]
+ *	 1. See ascii table that includes hex values:
+ *	    https://en.wikipedia.org/wiki/ASCII#Printable_characters
+ *	    https://en.wikipedia.org/wiki/ASCII#Character_set
+ *	 2. Check: https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=common/print.c
+ *	 3. isprint is more limited than isascii: http://www.cplusplus.com/reference/cctype/isprint/
+ */
 
 /* Notice (?x) must be a the beginning of the line - cannot be tabbed in,
  * because free spacing mode must start at the very beginning (^) of the
@@ -388,29 +389,30 @@ const base_regex = <<<'BASE'
 	\}
 BASE;
 /* Inside the: (?'NEXT_LEVEL' ... )
-   various white space characters where substituted with \s* to match all white
-   space, but at different places before the substitutions some of the white
-   space characters were as mentioned below and their purpose:
-   *  (star) needed for when no space or newline e.g. nested {} is used in e.g.:
-      something {dww w{} w {d;}}
-   \n (new line) needed for quicker matching (here)
-   \  (space) needed so we eat all space before a faulty double {}:
-      something {} {}
-      , is repeated - which we consider illegal.
-   \ \n has been substituted with \s to cover more white space characters!
-*/
+ * various white space characters where substituted with \s* to match all white
+ * space, but at different places before the substitutions some of the white
+ * space characters were as mentioned below and their purpose:
+ * *  (star) needed for when no space or newline e.g. nested {} is used in e.g.:
+ *    something {dww w{} w {d;}}
+ * \n (new line) needed for quicker matching (here)
+ * \  (space) needed so we eat all space before a faulty double {}:
+ *    something {} {}
+ *    , is repeated - which we consider illegal.
+ * \ \n has been substituted with \s to cover more white space characters!
+ */
 
-// https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=includes/dhcpd.h
-// struct lease etc. and various write_lease methods
-
-// https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/db.c
-// method for write lease file content is found here e.g. write_lease()
-
-// Notice lease time entries are written with C gmtime() as UTC:
-// https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=common/print.c
-// const char * print_time(TIME t) last else clause:
-// if (strftime(buf, sizeof(buf), "%w %Y/%m/%d %H:%M:%S;",
-//                              gmtime(&t)) == 0)
+/* https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=includes/dhcpd.h
+ * struct lease etc. and various write_lease methods
+ *
+ * https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/db.c
+ * method for write lease file content is found here e.g. write_lease()
+ *
+ * Notice lease time entries are written with C gmtime() as UTC:
+ * https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=common/print.c
+ * const char * print_time(TIME t) last else clause:
+ * if (strftime(buf, sizeof(buf), "%w %Y/%m/%d %H:%M:%S;",
+ *                              gmtime(&t)) == 0)
+ */
 const date_time = <<<'DATETIME'
 	(?'WEEKDAY'[0-6])\s+
 	(?'DATE'
@@ -452,12 +454,12 @@ const common_napd_bottom = <<<'COMMON'
 COMMON;
 
 /* Level 2 stuff
-   binding state names defined in array binding_state_names
-   https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/stables.c
-   "free", "active", "expired", "released", "abandoned", "reset", "backup"
-   write_lease and write_ia use binding_state_names in:
-   https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/db.c
-*/
+ * binding state names defined in array binding_state_names
+ * https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/stables.c
+ * "free", "active", "expired", "released", "abandoned", "reset", "backup"
+ * write_lease and write_ia use binding_state_names in:
+ * https://source.isc.org/cgi-bin/gitweb.cgi?p=dhcp.git;a=blob;f=server/db.c
+ */
 const ia_regex =
 '(?x)
 (binding\s+state\s+(?\'BINDINGSTATE\'free|active|expired|released|abandoned|reset|backup)|

@@ -46,71 +46,71 @@ require_once 'parser_ipv6.inc';
  * zero fails and zero passes, because of the above!
  */
 function test_parse_ipv6 ($content, $checklist, $only_errors) {
-  $amount_of_matches = preg_match_all('/'.ipv6_regex.'/i',$content,$matches,PREG_SET_ORDER);
+	$amount_of_matches = preg_match_all('/'.ipv6_regex.'/i',$content,$matches,PREG_SET_ORDER);
 
-  $amount_of_entries = count ($checklist);
-  if ($amount_of_matches != $amount_of_entries) {
-    echo "ERROR: Amount of matches does not equal amount of entries in the".
-         " check list: $amount_of_matches != $amount_of_entries\n";
-    return false;
-  }
+	$amount_of_entries = count ($checklist);
+	if ($amount_of_matches != $amount_of_entries) {
+		echo "ERROR: Amount of matches does not equal amount of entries in the".
+        	     " check list: $amount_of_matches != $amount_of_entries\n";
+		return false;
+	}
 
-  $counter=0;
-  $fail_counter=0;
-  foreach ($matches as $val) {
-    $next=$checklist[$counter];
-    if (strcmp ($val['MATCH'],$next) ) {
-      echo "FAIL: '".$val['MATCH']."' != '$next' \n";
-      $fail_counter+=1;
-    }
-    else if ( ! $only_errors) {
-      if (setnlen ($val, 'IPV64')) {
-        echo "IPv6+IPv4: ".$val['MATCH']."\n";
-      }
-      else if (setnlen ($val, 'IPV6')) {
-        echo "IPv6: ".$val['MATCH']."\n";
-      }
-      else {
-        echo ":-o undefined type: ".$val['MATCH']."\n";
-      }
-    }
+	$counter=0;
+	$fail_counter=0;
+	foreach ($matches as $val) {
+		$next=$checklist[$counter];
+		if (strcmp ($val['MATCH'],$next) ) {
+			echo "FAIL: '".$val['MATCH']."' != '$next' \n";
+			$fail_counter+=1;
+		}
+		else if ( ! $only_errors) {
+			if (setnlen ($val, 'IPV64')) {
+				echo "IPv6+IPv4: ".$val['MATCH']."\n";
+			}
+			else if (setnlen ($val, 'IPV6')) {
+				echo "IPv6: ".$val['MATCH']."\n";
+			}
+			else {
+				echo ":-o undefined type: ".$val['MATCH']."\n";
+			}
+		}
 
-    $counter+=1;
-  }
-  echo "Testing against text\n";
-  echo "Total amount of fails: $fail_counter\n";
-  echo "Total amount of passes: ".($counter - $fail_counter)."\n";
+		$counter+=1;
+	}
+	echo "Testing against text\n";
+	echo "Total amount of fails: $fail_counter\n";
+	echo "Total amount of passes: ".($counter - $fail_counter)."\n";
 
-  $counter=0;
-  $fail_counter=0;
-  foreach ($checklist as $sample) {
-      if (preg_match('/'.ipv6_regex.'/i',$sample,$matches)) {
-        if (strcmp ($matches['MATCH'],$sample) ) {
-          echo "FAIL: '".$matches['MATCH']."' != '$sample' \n";
-          $fail_counter+=1;
-        }
-        else if ( ! $only_errors) {
-          if (setnlen ($matches, 'IPV64')) {
-            echo "IPv6+IPv4: ".$matches['MATCH']."\n";
-          }
-          else if (setnlen ($matches, 'IPV6')) {
-            echo "IPv6: ".$matches['MATCH']."\n";
-          }
-          else {
-            echo ":-o undefined type: ".$matches['MATCH']."\n";
-          }
-        }
-      }
-      else {
-        echo "FAIL: Unable to match '$sample' \n";
-        $fail_counter+=1;
-      }
+	$counter=0;
+	$fail_counter=0;
+	foreach ($checklist as $sample) {
+		if (preg_match('/'.ipv6_regex.'/i',$sample,$matches)) {
+			if (strcmp ($matches['MATCH'],$sample) ) {
+				echo "FAIL: '".$matches['MATCH']."' != '$sample' \n";
+				$fail_counter+=1;
+			}
+			else if ( ! $only_errors) {
+	        		if (setnlen ($matches, 'IPV64')) {
+	        			echo "IPv6+IPv4: ".$matches['MATCH']."\n";
+				}
+				else if (setnlen ($matches, 'IPV6')) {
+					echo "IPv6: ".$matches['MATCH']."\n";
+				}
+				else {
+					echo ":-o undefined type: ".$matches['MATCH']."\n";
+				}
+			}
+		}
+		else {
+			echo "FAIL: Unable to match '$sample' \n";
+			$fail_counter+=1;
+		}
 
-      $counter+=1;
-  }
-  echo "Testing against list entries\n";
-  echo "Total amount of fails: $fail_counter\n";
-  echo "Total amount of passes: ".($counter - $fail_counter)."\n";
+		$counter+=1;
+	}
+	echo "Testing against list entries\n";
+	echo "Total amount of fails: $fail_counter\n";
+	echo "Total amount of passes: ".($counter - $fail_counter)."\n";
 }
 
 /*

@@ -149,7 +149,7 @@ $lang_pack = [ 'online' =>  $online_string, 'offline' => $offline_string,
                'dynamic' => $dynamic_string, 'static' =>  $static_string];
 // Handle the content of the lease file - parser/parser_dhcpv6_leases.inc
 gui_parse_leases ($pools, $leases, $prefixes, $mappings, $leases_content,
-									$ndpdata, $lang_pack);
+		  $ndpdata, $lang_pack);
 
 if (count($leases) > 0) {
 	$leases = remove_duplicate($leases, "ip");
